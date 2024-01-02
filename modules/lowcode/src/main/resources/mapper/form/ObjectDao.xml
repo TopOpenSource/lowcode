@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.form.mapper.ObjectDao">
+
+	<resultMap id="SysFormObjectMap" type="com.ruoyi.form.domain.FormObject">
+	    <id column="id" property="id" />
+	    <result column="gmt_create" property="gmtCreate" />
+	    <result column="gmt_modified" property="gmtModified" />
+	    <result column="create_account" property="createAccount" />
+	    <result column="modified_account" property="modifiedAccount" />
+	    <result column="is_delete" property="isDelete" />
+	    <result column="name" property="name" />
+		<result column="table_name" property="tableName" />
+		<result column="is_flow" property="isFlow" />
+		<result column="state" property="state" />
+		<result column="type" property="type" />
+		<result column="icon" property="icon" />
+	</resultMap>
+
+
+	<resultMap id="SysFormObjectDTOMap" type="com.ruoyi.form.dto.ObjectDTO">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="table_name" property="tableName" />
+		<result column="is_flow" property="isFlow" />
+		<result column="proc_def_id" property="processDefinitionId"/>
+		<result column="deploy_id"  property="deployId" />
+		<result column="type" property="type" />
+		<result column="icon" property="icon" />
+	</resultMap>
+
+
+
+	<sql id="SysFormObjectCols">
+      `id`,`gmt_create`,`gmt_modified`,`create_account`,`modified_account`,`is_delete`,`name`,`table_name`,`is_flow`,`state`,`type`,`icon`
+    </sql>
+
+    <sql id="SysFormObjectProps">
+      #{id},#{gmtCreate},#{gmtModified},#{createAccount},#{modifiedAccount},#{isDelete},#{name},#{isFlow},#{state},#{icon}
+    </sql>
+
+    <sql id="SysFormObjectWhere">
+      <if test="name != '' and name != null">
+		  and name like concat ('%',#{name},'%')
+	  </if>
+		 and	is_delete = '0'
+	</sql>
+
+    <sql id="SysFormObjectDtoWhere">
+
+    </sql>
+
+	<select id="selectByDto" parameterType="com.ruoyi.form.domain.FormObject" resultMap="SysFormObjectMap">
+		select
+			<include refid="SysFormObjectCols"></include>
+		from lowcode_object
+		<where>
+			<include refid="SysFormObjectWhere"></include>
+		</where>
+        order by gmt_modified desc
+	</select>
+
+	<select id="selectCountByDto" parameterType="com.ruoyi.form.domain.FormObject" resultType="Integer">
+		select
+			count(*)
+		from lowcode_object
+		<where>
+		    <include refid="SysFormObjectWhere"></include>
+		</where>
+	</select>
+
+	<select id="listObjectDTO" parameterType="com.ruoyi.form.dto.ObjectDTO" resultMap="SysFormObjectDTOMap">
+		SELECT
+			t1.id,
+			t1.`name`,
+			t1.table_name,
+		    t1.is_flow,
+		    t1.type,
+		    t1.icon,
+			t2.proc_def_id,
+		    t2.deploy_id
+		FROM
+			lowcode_object t1
+			LEFT JOIN lowcode_workflow t2 ON t1.id = t2.form_object_id
+        <where>
+			t1.is_delete=0
+            /*and t2.is_delete=0*/
+            and t1.state=0
+			<if test="isFlow != '' and isFlow != null">
+			and t1.is_flow=#{isFlow}
+			</if>
+			<if test="type != '' and type != null">
+				and t1.type=#{type}
+			</if>
+		</where>
+
+	</select>
+</mapper>

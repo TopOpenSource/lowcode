@@ -1,0 +1,100 @@
+# Tomcat
+server:
+  port: 8004
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: lowcode
+
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: 172.16.15.141:8848
+
+  redis:
+    host: 172.16.15.141
+    port: 6379
+    password: qwe123-=
+    database: 0
+  datasource:
+    druid:
+      stat-view-servlet:
+        enabled: true
+        loginUsername: admin
+        loginPassword: 123456
+    dynamic:
+      druid:
+        initial-size: 5
+        min-idle: 5
+        maxActive: 20
+        maxWait: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        filters: stat,slf4j
+        connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+      datasource:
+        # 主库数据源
+        master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://172.16.15.141:3308/ry-lowcode?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+          username: root
+          password: root
+          # 从库数据源
+          # slave:
+          # username:
+          # password:
+          # url:
+          # driver-class-name:
+
+# MyBatis Plus配置
+mybatis-plus:
+  # 搜索指定包别名
+  typeAliasesPackage: com.ruoyi.**.domain
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath*:mapper/**/*Mapper.xml,classpath*:mapper/**/*Dao.xml
+  # 加载全局的配置文件
+  configLocation: classpath:mybatis/mybatis-config.xml
+
+#flowable设置
+flowable:
+  database-schema-update: true
+  #异步
+  async-executor-activate: false
+  rest-api-enabled: false
+  #关闭cmmn
+  cmmn:
+    enabled: false
+  form:
+    enabled: false
+  app:
+    enabled: false
+  dmn:
+    enabled: false
+  idm:
+    enabled: false
+  content:
+    enabled: false
+  eventregistry:
+    enabled: false
+
+# 消息通知配置
+noticeSender:
+  email:
+    sender: 773817093@qq.com
+    code: nmdoafqxbbowbdbf
+    smtp:
+      host: smtp.qq.com
+      port: 465
+
+  dingTalk:
+    webhook: https://oapi.dingtalk.com/robot/send?access_token=2828bb2c67190e2cc313e44eaa541f82e705e0552d1a28bdd032e012bafcfcb5
+    key: SECbdd0e4e9e406db7bb9e6ffbecf544088059082ef418ce09eb9064de74f782f8a

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.form.mapper.ObjectAttributeDao">
+	
+	<resultMap id="SysFormObjectAttributeMap" type="com.ruoyi.form.domain.FormObjectAttribute">
+	    <id column="id" property="id" />
+	    <result column="gmt_create" property="gmtCreate" />
+	    <result column="gmt_modified" property="gmtModified" />
+	    <result column="create_account" property="createAccount" />
+	    <result column="modified_account" property="modifiedAccount" />
+	    <result column="is_delete" property="isDelete" />
+	    <result column="object_id" property="objectId" />
+	    <result column="name" property="name" />
+	    <result column="type" property="type" />
+	    <result column="dict_type_code" property="dictTypeCode" />
+	    <result column="db_type" property="dbType" />
+	    <result column="db_length" property="dbLength" />
+		<result column="decimals" property="decimals" />
+	    <result column="display_type" property="displayType" />
+		<result column="display_flat" property="displayFlat" />
+	    <result column="display_title" property="displayTitle" />
+	    <result column="display_regex" property="displayRegex" />
+	    <result column="notnull" property="notnull" />
+	    <result column="unique" property="unique" />
+		<result column="enable" property="enable" />
+		<result column="is_default" property="isDefault" />
+		<result column="display_fullline" property="displayFullline" />
+		<result column="display_minlength" property="displayMinlength" />
+		<result column="alias" property="alias" />
+		<result column="multiple" property="multiple" />
+	</resultMap>
+
+	<sql id="SysFormObjectAttributeCols">
+		`id`,`gmt_create`,`gmt_modified`,`create_account`,`modified_account`,`is_delete`,`object_id`,`name`,`type`,`dict_type_code`,`db_type`,`db_length`,`decimals`,`display_type`,`display_flat`,`display_title`,`display_regex`,`notnull`,`unique`,`enable`,`is_default`,`display_fullline`,`alias`,`display_minlength`, `multiple`
+	</sql>
+
+	<sql id="SysFormObjectAttributeProps">
+		#{id},#{gmtCreate},#{gmtModified},#{createAccount},#{modifiedAccount},#{isDelete},#{objectId},#{name},#{type},#{dictTypeCode},#{dbType},#{dbLength},#{decimals},#{displayType},#{displayFlat},#{displayTitle},#{displayRegex},#{notnull},#{unique},#{enable},#{isDefault},#{displayFullline},#{alias},#{displayMinlength}, #{multiple}
+	</sql>
+
+    <update id="deleteByObjectId">
+		delete from lowcode_object_attribute where object_id = #{objectId}
+	</update>
+
+    <select id="selectByDto" parameterType="com.ruoyi.form.domain.FormObjectAttribute" resultMap="SysFormObjectAttributeMap">
+		select
+			<include refid="SysFormObjectAttributeCols"></include>
+		from lowcode_object_attribute
+		<where>
+		    <if test="objectId!=null">
+				and object_id=#{objectId}
+			</if>
+			<if test="alias!=null and alias != ''">
+				and alias=#{alias}
+			</if>
+			and is_delete='0'
+			<if test="enable!=null and enable!=''">
+				and enable=#{enable}
+			</if>
+
+		</where>
+	</select>
+
+	<resultMap id="SysFormObjectAttributeDTOMap" type="com.ruoyi.form.dto.ObjectAttributeDTO" extends="SysFormObjectAttributeMap">
+		<result column="typeName" property="typeName" />
+	</resultMap>
+
+	<select id="selectListByDTO" parameterType="com.ruoyi.form.dto.ObjectAttributeDTO" resultMap="SysFormObjectAttributeDTOMap">
+		select a.*, t.`name` as typeName
+		from lowcode_object_attribute a
+		LEFT JOIN lowcode_attribute_type t ON a.type = t.type
+		<where>
+			<if test="objectId!=null">
+				and a.`object_id`=#{objectId}
+			</if>
+			<if test="isDefault != null">
+				and a.`is_default` = #{isDefault}
+			</if>
+			and a.`is_delete`='0'
+		</where>
+		order by a.gmt_create desc
+	</select>
+
+	<insert id="insertOne" parameterType="com.ruoyi.form.dto.ObjectAttributeDTO">
+		insert into lowcode_object_attribute (
+			`id`,
+			`gmt_create`,
+			`gmt_modified`,
+			`create_account`,
+			`modified_account`,
+			`is_delete`,
+			`object_id`,
+			`name`,
+			`type`,
+			`dict_type_code`,
+			`db_type`,
+			`db_length`,
+			`decimals`,
+			`display_type`,
+			`display_flat`,
+			`display_title`,
+			`display_regex`,
+			`display_minlength`,
+			`notnull`,
+			`UNIQUE`,
+			`is_default`,
+			`ENABLE`,
+			`display_fullline`,
+			`alias`,
+		    `multiple`
+		) values (
+			#{id},
+			#{gmtCreate},
+			#{gmtModified},
+			#{createAccount},
+			#{modifiedAccount},
+			#{isDelete},
+			#{objectId},
+			#{name},
+			#{type},
+			#{dictTypeCode},
+			#{dbType},
+			#{dbLength},
+			#{decimals},
+			#{displayType},
+			#{displayFlat},
+			#{displayTitle},
+			#{displayRegex},
+			#{displayMinlength},
+			#{notnull},
+			#{unique},
+			#{isDefault},
+			#{enable},
+			#{displayFullline},
+			#{alias},
+		    #{multiple}
+		)
+	</insert>
+
+	<update id="updateOne" parameterType="com.ruoyi.form.dto.ObjectAttributeDTO">
+		UPDATE lowcode_object_attribute
+		<set>
+			<if test="gmtModified != null">
+				`gmt_modified` = #{gmtModified},
+			</if>
+			<if test="modifiedAccount != null">
+				`modified_account` = #{modifiedAccount},
+			</if>
+			<if test="name != null">
+				`name` = #{name},
+			</if>
+			<if test="dictTypeCode != null">
+				`dict_type_code` = #{dictTypeCode},
+			</if>
+			<if test="dbLength != null">
+				`db_length` = #{dbLength},
+			</if>
+			<if test="decimals != null">
+				`decimals` = #{decimals},
+			</if>
+			<if test="displayFlat != null">
+				`display_flat` = #{displayFlat},
+			</if>
+			<if test="displayTitle != null">
+				`display_title` = #{displayTitle},
+			</if>
+			<if test="displayRegex != null">
+				`display_regex` = #{displayRegex},
+			</if>
+			<if test="displayMinlength != null">
+				`display_minlength` = #{displayMinlength},
+			</if>
+			<if test="notnull != null">
+				`notnull` = #{notnull},
+			</if>
+			<if test="unique != null">
+				`unique` = #{unique},
+			</if>
+			<if test="displayFullline != null">
+				`display_fullline` = #{displayFullline}
+			</if>
+		</set>
+		<where>
+			`id` = #{id}
+			and `is_delete` = '0'
+			and `object_id` = #{objectId}
+		</where>
+	</update>
+
+</mapper>

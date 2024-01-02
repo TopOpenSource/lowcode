@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.form.mapper.base.ObjectBaseDao">
+	
+	<resultMap id="SysFormObjectMap" type="com.ruoyi.form.domain.FormObject">
+	    <id column="id" property="id" />
+	    <result column="gmt_create" property="gmtCreate" />
+	    <result column="gmt_modified" property="gmtModified" />
+	    <result column="create_account" property="createAccount" />
+	    <result column="modified_account" property="modifiedAccount" />
+	    <result column="is_delete" property="isDelete" />
+	    <result column="name" property="name" />
+		<result column="table_name" property="tableName" />
+		<result column="is_flow" property="isFlow" />
+	</resultMap>
+	
+    <sql id="SysFormObjectCols">
+      `id`,`gmt_create`,`gmt_modified`,`create_account`,`modified_account`,`is_delete`,`name`,`table_name`,`is_flow`,`state`,`type`,`icon`
+    </sql>
+    
+    <sql id="SysFormObjectProps">
+      #{id},#{gmtCreate},#{gmtModified},#{createAccount},#{modifiedAccount},#{isDelete},#{name},#{tableName},#{isFlow},#{state},#{type},#{icon}
+    </sql>
+    
+    <insert id="insert" parameterType="com.ruoyi.form.domain.FormObject">
+        insert into lowcode_object
+        (<include refid="SysFormObjectCols"></include>)
+        values
+        (<include refid="SysFormObjectProps"></include>)
+    </insert>
+        
+    <update id="updateSelectiveByPK" parameterType="com.ruoyi.form.domain.FormObject">
+		update lowcode_object
+		<set>
+		  
+	        <if test="gmtCreate != null">
+		        gmt_create = #{gmtCreate},
+		    </if>
+		  
+	        <if test="gmtModified != null">
+		        gmt_modified = #{gmtModified},
+		    </if>
+		  
+	        <if test="createAccount != null and createAccount != ''">
+		        create_account = #{createAccount},
+		    </if>
+		  
+	        <if test="modifiedAccount != null and modifiedAccount != ''">
+		        modified_account = #{modifiedAccount},
+		    </if>
+		  
+	        <if test="isDelete != null and isDelete != ''">
+		        is_delete = #{isDelete},
+		    </if>
+		  
+
+	        <if test="name != null and name != ''">
+		        name = #{name},
+		    </if>
+
+	        <if test="tableName != null and tableName != ''">
+				`table_name` = #{tableName},
+		    </if>
+	        <if test="isFlow != null and isFlow != ''">
+				`is_flow` = #{isFlow},
+		    </if>
+			<if test="state != null and state != ''">
+				`state` = #{state},
+			</if>
+			<if test="type != null and type != ''">
+				`type` = #{type},
+			</if>
+			<if test="icon != null and icon != ''">
+				`icon` = #{icon},
+			</if>
+		</set>
+		<where>
+		  id = #{id} 
+
+		</where> 
+	</update>
+	
+	<update id="updateByPK" parameterType="com.ruoyi.form.domain.FormObject">
+		update lowcode_object
+		<set>
+	    gmt_create = #{gmtCreate},
+	    gmt_modified = #{gmtModified},
+	    create_account = #{createAccount},
+	    modified_account = #{modifiedAccount},
+	    is_delete = #{isDelete},
+	    name = #{name},
+		`table_name` = #{tableName},
+		`is_flow` = #{isFlow},
+		</set>
+		<where>
+		  id = #{id} 
+
+		</where> 
+	</update>
+	
+	<delete id="deleteByPK">
+	   delete from lowcode_object where id = #{id}
+	</delete>
+	
+	<select id="selectByPK" resultMap="SysFormObjectMap">
+		select
+			<include refid="SysFormObjectCols"></include>
+		from lowcode_object
+		<where>
+		  id = #{id} 
+
+		  and is_delete = '0'
+		</where> 
+	</select>
+	
+</mapper>

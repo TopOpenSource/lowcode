@@ -1,0 +1,20 @@
+# Tomcat
+server: 
+  port: 8003
+
+# Spring
+spring: 
+  application:
+    # 应用名称
+    name: auth
+  redis:
+    host: 172.16.15.141
+    port: 6379
+    password: qwe123-=
+    # 数据库索引
+    database: 0
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: 172.16.15.141:8848

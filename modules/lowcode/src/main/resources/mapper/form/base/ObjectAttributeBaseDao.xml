@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.form.mapper.base.ObjectAttributeBaseDao">
+
+	<resultMap id="SysFormObjectAttributeMap" type="com.ruoyi.form.domain.FormObjectAttribute">
+		<id column="id" property="id" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modified" property="gmtModified" />
+		<result column="create_account" property="createAccount" />
+		<result column="modified_account" property="modifiedAccount" />
+		<result column="is_delete" property="isDelete" />
+		<result column="object_id" property="objectId" />
+		<result column="name" property="name" />
+		<result column="type" property="type" />
+		<result column="dict_type_code" property="dictTypeCode" />
+		<result column="db_type" property="dbType" />
+		<result column="db_length" property="dbLength" />
+		<result column="decimals" property="decimals" />
+		<result column="display_type" property="displayType" />
+		<result column="display_flat" property="displayFlat" />
+		<result column="display_title" property="displayTitle" />
+		<result column="display_regex" property="displayRegex" />
+		<result column="notnull" property="notnull" />
+		<result column="unique" property="unique" />
+		<result column="enable" property="enable" />
+		<result column="display_minlength" property="displayMinlength" />
+		<result column="is_default" property="isDefault" />
+		<result column="display_fullline" property="displayFullline" />
+	</resultMap>
+
+	<sql id="SysFormObjectAttributeCols">
+		`id`,`gmt_create`,`gmt_modified`,`create_account`,`modified_account`,`is_delete`,`object_id`,`name`,`type`,`dict_type_code`,`db_type`,`db_length`,`decimals`,`display_type`,`display_flat`,`display_title`,`display_regex`,`notnull`,`unique`,`enable`,`is_default`,`alias`,`multiple`
+	</sql>
+
+	<sql id="SysFormObjectAttributeProps">
+		#{id},#{gmtCreate},#{gmtModified},#{createAccount},#{modifiedAccount},#{isDelete},#{objectId},#{name},#{type},#{dictTypeCode},#{dbType},#{dbLength},#{decimals},#{displayType},#{displayFlat},#{displayTitle},#{displayRegex},#{notnull},#{unique},#{enable},#{isDefault},#{alias},#{multiple}
+	</sql>
+
+    <insert id="insert" parameterType="com.ruoyi.form.domain.FormObjectAttribute">
+        insert into lowcode_object_attribute
+        (<include refid="SysFormObjectAttributeCols"></include>)
+        values
+        (<include refid="SysFormObjectAttributeProps"></include>)
+    </insert>
+
+	<delete id="deleteByPK">
+	   <!--存在删除状态键则逻辑删除-->
+		update lowcode_object_attribute
+		set is_delete = '1'
+		<where>
+		  id = #{id}
+
+		</where>
+	</delete>
+
+	<delete id="deleteById">
+		delete from lowcode_object_attribute where id = #{id}
+	</delete>
+
+	<delete id="deleteByCol">
+		ALTER TABLE ${tableName} DROP ${alias}
+	</delete>
+
+	<select id="selectByPK" resultMap="SysFormObjectAttributeMap">
+		select *
+		from lowcode_object_attribute
+		<where>
+		  id = #{id}
+
+		  and is_delete = '0'
+		</where>
+	</select>
+	<select id="canDel" resultType="java.lang.String">
+		select ${alias} from ${tableName}
+	</select>
+	<select id="selectByObjectId" resultType="com.ruoyi.form.domain.FormObjectAttribute">
+		select * from lowcode_object_attribute
+		<where>
+			object_id = #{objectId} and is_delete = '0' and enable = '1'
+		</where>
+	</select>
+
+
+</mapper>

@@ -1,0 +1,93 @@
+.content-box {
+  position: absolute;
+  left: 250px;
+  right: 0;
+  top: 70px;
+  bottom: 0;
+  padding-bottom: 30px;
+  -webkit-transition: left .3s ease-in-out;
+  transition: left .3s ease-in-out;
+  background: #f0f0f0;
+}
+
+.content {
+  width: auto;
+  height: 100%;
+  padding: 10px;
+  min-height: calc(100vh - 100px);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.content-collapse {
+  left: 65px;
+}
+
+.container {
+  padding: 10px 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+
+// 表格外框样式
+.table-row {
+  border: solid 1px #E8ECF0;
+  border-bottom: unset;
+}
+
+// 表格整体样式s
+.el-table {
+  .cell {
+    font-weight: 500;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  tr {
+    // height: 36px;
+  }
+
+  td {
+    padding: 10px 0;
+  }
+
+  .el-table__header {
+    tr {
+      .cell {
+        font-size: 13px;
+        font-family: MicrosoftYaHei;
+        color: #515a6e;
+        font-weight: 600;
+      }
+    }
+
+    th {
+      padding: 5px 0;
+      word-break: break-word;
+      background-color: #f8f8f9;
+      color: #515a6e;
+      height: 52px;
+      font-size: 13px;
+    }
+  }
+}
+
+//button
+.el-button {
+  border-radius: 3px;
+  height: 32px;
+  line-height: 10px;
+  font-size: 12px;
+  text-align: center;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}

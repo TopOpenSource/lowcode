@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.dynamicform.mapper.DynamicFormMapper">
+
+    <select id="selectList" resultType="com.ruoyi.common.dto.CommonDto">
+        select t1.id,t1.is_delete,t3.proc_inst_id
+        <if test="queryCols != null and queryCols != ''">
+            , ${queryCols}
+        </if>
+        from ${tableName} t1
+        left join lowcode_workflow_instance t3 on t1.id=t3.object_instance_id
+        <where>
+            t1.`is_delete` = '0'
+            <if test="queryWhere != null and queryWhere != ''">
+                <![CDATA[  and ( ${queryWhere} )  ]]>
+            </if>
+            <if test="queryWhereAppend != null and queryWhereAppend != ''">
+                <![CDATA[  and ( ${queryWhereAppend} )  ]]>
+            </if>
+
+        </where>
+        <if test="(orderType=='DESC' || orderType=='ASC') and orderBy!=null and orderBy != ''">
+            order by ${orderBy} ${orderType}
+        </if>
+    </select>
+
+
+    <select id="selectListWithTask" resultType="com.ruoyi.common.dto.CommonDto">
+        select t1.id,t1.is_delete,LWI.task_name as taskName,LWI.task_assignees as taskAssignees
+        <if test="viewDto.queryCols != null and viewDto.queryCols != ''">
+            , ${viewDto.queryCols}
+        </if>
+        from lowcode_workflow_instance LWI
+        left join ${viewDto.tableName} t1 on LWI.object_instance_id=t1.id
+        <where>
+            t1.`is_delete` = '0'
+            <if test="viewDto.queryWhere != null and viewDto.queryWhere != ''">
+                <![CDATA[  and ( ${viewDto.queryWhere} )  ]]>
+            </if>
+            <if test="viewDto.queryWhereAppend != null and viewDto.queryWhereAppend != ''">
+                <![CDATA[  and ( ${viewDto.queryWhereAppend} )  ]]>
+            </if>
+            <!--待办-->
+            <if test='taskDto.queryFlow !=null and taskDto.queryFlow == "1"'>
+                and (
+                    EXISTS(
+                        select *
+                        from ACT_RU_TASK RES
+                        where RES.ASSIGNEE_ = #{taskDto.userName} and RES.PROC_INST_ID_=LWI.proc_inst_id
+                    )
+                    OR EXISTS (
+                        select *
+                        from  ACT_RU_IDENTITYLINK LINK
+                        where
+                        LINK.TYPE_ = 'candidate'
+                        AND LINK.PROC_INST_ID_ = LWI.proc_inst_id
+                        AND ( LINK.USER_ID_ = #{taskDto.userName} OR LINK.GROUP_ID_ IN
+                            <foreach collection="taskDto.groupIds" open="("  item="groupId"  separator="," close=")">
+                                        #{groupId}
+                            </foreach>
+                            )
+                    )
+                )
+            </if>
+            <!--已办-->
+            <if test='taskDto.queryFlow !=null and taskDto.queryFlow == "2"'>
+             and  EXISTS (select * from act_hi_taskinst t3 where t3.proc_inst_id_=LWI.proc_inst_id and t3.END_TIME_ is not null and t3.ASSIGNEE_=#{taskDto.userName})
+            </if>
+        </where>
+
+        <if test="(viewDto.orderType=='DESC' || viewDto.orderType=='ASC') and (viewDto.orderBy!=null and viewDto.orderBy != '')">
+            order by ${viewDto.orderBy} ${viewDto.orderType}
+        </if>
+
+    </select>
+
+    <delete id="delBatch">
+         delete from  ${tableName}
+         where id in
+        <foreach collection="ids" open="("  item="id"  separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

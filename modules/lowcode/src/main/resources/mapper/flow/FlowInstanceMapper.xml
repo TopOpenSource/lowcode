@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.flow.mapper.FlowInstanceMapper">
+
+    <update id="updateFlowInst" parameterType="com.ruoyi.flow.domain.FlowInstance">
+        update lowcode_workflow_instance
+        <set>
+            <if test="comment != null">
+                comment=#{comment},
+            </if>
+            <if test="procInstId != null">
+                proc_inst_id=#{procInstId},
+            </if>
+            <if test="applyId != null">
+                apply_id=#{applyId},
+            </if>
+            <if test="applyTime != null">
+                apply_time=#{applyTime},
+            </if>
+            <if test="comment != null">
+                comment=#{comment},
+            </if>
+            <if test="deployId != null">
+                deploy_id=#{deployId},
+            </if>
+            <if test="procDefId != null">
+                proc_def_id=#{procDefId},
+            </if>
+        </set>
+        <where>
+              id=#{id}
+        </where>
+    </update>
+</mapper>

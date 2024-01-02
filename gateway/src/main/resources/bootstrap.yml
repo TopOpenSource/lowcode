@@ -1,0 +1,77 @@
+# Tomcat
+server:
+  port: 8001
+
+# Spring
+spring:
+  redis:
+    host: 172.16.15.141
+    port: 6379
+    password: qwe123-=
+    database: 0
+  application:
+    # 应用名称
+    name: gateway
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: 172.16.15.141:8848
+    gateway:
+      discovery:
+        locator:
+          lowerCaseServiceId: true
+          enabled: true
+      routes:
+        # 认证中心
+        - id: auth
+          uri: lb://auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            # 验证码处理
+            - CacheRequestFilter
+            - ValidateCodeFilter
+            - StripPrefix=1
+        # 系统模块
+        - id: system
+          uri: lb://system
+          predicates:
+            - Path=/system/**
+          filters:
+            - StripPrefix=1
+        # 低代码模块
+        - id: lowcode
+          uri: lb://lowcode
+          predicates:
+            - Path=/lowcode/**
+          filters:
+            - StripPrefix=1
+        # 运维模块
+        - id: itsm
+          uri: lb://itsm
+          predicates:
+            - Path=/itsm/**
+          filters:
+            - StripPrefix=1
+
+# 安全配置
+security:
+  # 验证码
+  captcha:
+    enabled: false
+    type: math
+  # 防止XSS攻击
+  xss:
+    enabled: false
+    excludeUrls:
+      - /system/notice
+  # 不校验白名单
+  ignore:
+    whites:
+      - /auth/logout
+      - /auth/login
+      - /auth/register
+      - /chatops/ws
+      - /*/v2/api-docs
+      - /csrf

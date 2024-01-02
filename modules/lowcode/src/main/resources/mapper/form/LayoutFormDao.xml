@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.form.mapper.LayoutFormDao">
+	
+	<resultMap id="SysFormLayoutFormMap" type="com.ruoyi.form.domain.LayoutForm">
+	    <id column="id" property="id" />
+	    <result column="gmt_create" property="gmtCreate" />
+	    <result column="gmt_modified" property="gmtModified" />
+	    <result column="create_account" property="createAccount" />
+	    <result column="modified_account" property="modifiedAccount" />
+	    <result column="is_delete" property="isDelete" />
+	    <result column="object_id" property="objectId" />
+	    <result column="name" property="name" />
+	    <result column="type" property="type" />
+	    <result column="content" property="content" />
+	    <result column="enable" property="enable" />
+	    <result column="is_default" property="isDefault" />
+		<result column="modifiedName" property="modifiedName" />
+	</resultMap>
+	
+    <sql id="SysFormLayoutFormCols">
+      `id`,`gmt_create`,`gmt_modified`,`create_account`,`modified_account`,`is_delete`,`object_id`,`name`,`type`,`content`,`enable`,`is_default`
+    </sql>
+    
+    <sql id="SysFormLayoutFormProps">
+      #{id},#{gmtCreate},#{gmtModified},#{createAccount},#{modifiedAccount},#{isDelete},#{objectId},#{name},#{type},#{content},#{enable},#{isDefault}
+    </sql>
+    <delete id="deleteByObjectId">
+		delete from lowcode_layout_form where object_id = #{objectId}
+	</delete>
+
+    <select id="selectByDto" parameterType="com.ruoyi.form.domain.LayoutForm" resultMap="SysFormLayoutFormMap">
+		select
+		t1.`id`,t1.`gmt_modified`,t1.`modified_account`,t1.`object_id`,t1.`name`,t1.`type`,t1.`enable`,t1.`is_default`,t2.nick_name as modifiedName
+		from lowcode_layout_form t1
+		left join  sys_user t2 on t1.modified_account=t2.user_name
+		<where>
+			<if test="objectId!=null">
+				and t1.object_id=#{objectId}
+			</if>
+			<if test="type!=null and type!=''">
+				and t1.type=#{type}
+			</if>
+			and t1.is_delete='0'
+		</where>
+	</select>
+
+    <select id="selectFormDetailByObjectId" resultMap="SysFormLayoutFormMap">
+		select <include refid="SysFormLayoutFormCols" />
+		from lowcode_layout_form
+		where  object_id=#{objectId} and type=#{type}  and is_delete='0'  and enable='1'
+	</select>
+
+    <update id="enable" parameterType="com.ruoyi.form.domain.LayoutForm">
+       update lowcode_layout_form t1
+       set t1.enable=#{enable}
+       <where>
+           <if test="id!=null">
+			   t1.id=#{id}
+		   </if>
+		   and t1.object_id=#{objectId}
+		   and t1.type=#{type}
+		   and t1.is_delete='0'
+	   </where>
+
+	</update>
+
+</mapper>

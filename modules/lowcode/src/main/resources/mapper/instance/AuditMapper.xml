@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.instance.mapper.AuditMapper">
+
+    <resultMap id="FlowTaskMap" type="com.ruoyi.flow.dto.FlowTaskDto">
+        <result column="taskId" property="taskId" />
+        <result column="taskName" property="taskName" />
+        <result column="procInstId" property="procInstId" />
+        <result column="comment" property="comment" />
+        <result column="user_name" property="applyName" />
+        <result column="object_id" property="objectId" />
+        <result column="apply_time" property="applyTime" />
+        <result column="object_instance_id" property="objectInstanceId" />
+        <result column="deploy_id" property="deployId" />
+        <result column="executionId" property="executionId" />
+        <result column="actId" property="actId" />
+        <result column="taskDefKey" property="taskDefKey" />
+        <result column="task_name" property="taskName" />
+        <result column="task_assignees" property="taskAssignees" />
+    </resultMap>
+
+    <select id="getMyTask" resultMap="FlowTaskMap">
+        SELECT DISTINCT
+            RES.ID_ as taskId,RES.EXECUTION_ID_ as executionId,RES.TASK_DEF_KEY_ as actId, RES.PROC_INST_ID_ as procInstId,RES.NAME_ as taskName,
+            t2.`comment`,t2.apply_id,t2.object_id,t2.object_instance_id,t2.apply_time,t2.deploy_id,t2.task_assignees,
+            t3.user_name
+            from ACT_RU_TASK RES
+            left join lowcode_workflow_instance t2 on RES.PROC_INST_ID_=t2.proc_inst_id
+            left join sys_user t3 on t2.apply_id=t3.user_name
+        WHERE
+            RES.ASSIGNEE_ = #{userName}
+            <if test="dto.comment != null and dto.comment != ''">
+                AND t2.comment like concat('%', #{dto.comment}, '%')
+            </if>
+            <if test="dto.applyName != null and dto.applyName != ''">
+                AND t2.create_by = #{dto.applyName}
+            </if>
+            <if test="dto.params.beginTime != null and dto.params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(t2.create_time,'%y%m%d') &gt;= date_format(#{dto.params.beginTime},'%y%m%d')
+            </if>
+            <if test="dto.params.endTime != null and dto.params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(t2.create_time,'%y%m%d') &lt;= date_format(#{dto.params.endTime},'%y%m%d')
+            </if>
+           <!--待办-->
+           OR EXISTS (
+                SELECT
+                    LINK.ID_
+                FROM
+                    ACT_RU_IDENTITYLINK LINK
+                WHERE
+                    LINK.TYPE_ = 'candidate'
+                  AND LINK.TASK_ID_ = RES.ID_
+                  AND ( LINK.USER_ID_ =  #{userName} OR LINK.GROUP_ID_ IN
+                    <foreach collection="groupIds" open="(" separator="," close=")" item="groupId">
+                        #{groupId}
+                    </foreach>
+                      )
+            )
+        ORDER BY t2.apply_time DESC
+    </select>
+
+
+    <select id="selectMyTask"  resultMap="FlowTaskMap">
+        SELECT RES.ID_ as taskId,RES.TASK_DEF_KEY_ as taskDefKey
+        from ACT_RU_TASK RES
+        left join lowcode_workflow_instance t2 on RES.PROC_INST_ID_=t2.proc_inst_id
+        WHERE
+        t2.object_instance_id=#{instId}
+        and
+        (
+        <!--待办-->
+        RES.ASSIGNEE_ = #{userName}
+        OR EXISTS (
+        SELECT
+        LINK.ID_
+        FROM
+        ACT_RU_IDENTITYLINK LINK
+        WHERE
+        LINK.TYPE_ = 'candidate'
+        AND LINK.TASK_ID_ = RES.ID_
+        AND ( LINK.USER_ID_ =  #{userName} OR LINK.GROUP_ID_ IN
+        <foreach collection="groupIds" open="(" separator="," close=")" item="groupId">
+            #{groupId}
+        </foreach>
+        )
+        )
+        )
+        ORDER BY
+        RES.ID_ ASC
+    </select>
+
+    <select id="getMyFinishedTask" resultMap="FlowTaskMap">
+        SELECT DISTINCT
+            t2.`comment`,t2.apply_id,t2.object_id,t2.object_instance_id,t2.apply_time,t2.deploy_id,t2.task_name,t2.task_assignees,t3.user_name
+        from  lowcode_workflow_instance t2
+        left join sys_user t3 on t2.apply_id=t3.user_name
+        where
+            EXISTS (select * from act_hi_taskinst t3 where t3.proc_inst_id_=t2.proc_inst_id and t3.END_TIME_ is not null and t3.ASSIGNEE_=#{userName}
+            <if test="dto.comment != null and dto.comment != ''">
+                AND t2.comment like concat('%', #{dto.comment}, '%')
+            </if>
+            <if test="dto.applyName != null and dto.applyName != ''">
+                AND t2.create_by = #{dto.applyName}
+            </if>
+            <if test="dto.params.beginTime != null and dto.params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(t2.apply_time,'%y%m%d') &gt;= date_format(#{dto.params.beginTime},'%y%m%d')
+            </if>
+            <if test="dto.params.endTime != null and dto.params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(t2.apply_time,'%y%m%d') &lt;= date_format(#{dto.params.endTime},'%y%m%d')
+            </if>)
+        ORDER BY t2.apply_time DESC
+    </select>
+
+    <select id="getUnSubmit" resultMap="FlowTaskMap">
+        SELECT
+            t2.`comment`,
+            t2.apply_id,
+            t2.object_id,
+            t2.object_instance_id,
+            t2.apply_time,
+            t2.create_time,
+            t2.deploy_id,
+            t3.user_name
+        FROM
+            lowcode_workflow_instance t2
+            LEFT JOIN sys_user t3 ON t2.apply_id = t3.user_name
+        <where>
+            apply_id=#{userName}
+            and t2.proc_inst_id is null
+            <if test="dto.comment != null and dto.comment != ''">
+                AND t2.comment like concat('%', #{dto.comment}, '%')
+            </if>
+            <if test="dto.applyName != null and dto.applyName != ''">
+                AND t2.create_by = #{dto.applyName}
+            </if>
+            <if test="dto.params.beginTime != null and dto.params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(t2.create_time,'%y%m%d') &gt;= date_format(#{dto.params.beginTime},'%y%m%d')
+            </if>
+            <if test="dto.params.endTime != null and dto.params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(t2.create_time,'%y%m%d') &lt;= date_format(#{dto.params.endTime},'%y%m%d')
+            </if>
+        </where>
+        ORDER BY t2.create_time DESC
+    </select>
+
+    <select id="getMyApplyTask" resultMap="FlowTaskMap">
+        SELECT
+        t2.`comment`,
+        t2.apply_id,
+        t2.object_id,
+        t2.object_instance_id,
+        t2.apply_time,
+        t2.deploy_id,
+        t2.task_name,
+        t2.task_assignees,
+        t3.user_name
+        FROM
+        lowcode_workflow_instance t2
+        LEFT JOIN sys_user t3 ON t2.apply_id = t3.user_name
+        <where>
+            apply_id=#{userName}
+            <if test="dto.comment != null and dto.comment != ''">
+                AND t2.comment like concat('%', #{dto.comment}, '%')
+            </if>
+            <if test="dto.taskName != null and dto.taskName != ''">
+                AND t2.task_name = #{dto.taskName}
+            </if>
+            <if test="dto.params.beginTime != null and dto.params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(t2.apply_time,'%y%m%d') &gt;= date_format(#{dto.params.beginTime},'%y%m%d')
+            </if>
+            <if test="dto.params.endTime != null and dto.params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(t2.apply_time,'%y%m%d') &lt;= date_format(#{dto.params.endTime},'%y%m%d')
+            </if>
+        </where>
+        ORDER BY t2.apply_time DESC
+    </select>
+
+</mapper>

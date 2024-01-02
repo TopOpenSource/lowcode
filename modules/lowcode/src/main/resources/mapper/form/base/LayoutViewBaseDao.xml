@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.form.mapper.base.LayoutViewBaseDao">
+
+    <resultMap id="SysFormLayoutViewMap" type="com.ruoyi.form.domain.LayoutView">
+        <id column="id" property="id"/>
+        <result column="gmt_create" property="gmtCreate"/>
+        <result column="gmt_modified" property="gmtModified"/>
+        <result column="create_account" property="createAccount"/>
+        <result column="modified_account" property="modifiedAccount"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="object_id" property="objectId"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="query_criteria" property="queryCriteria"/>
+        <result column="table_column" property="tableColumn"/>
+        <result column="table_column_mobile" property="tableColumnMobile"/>
+        <result column="sort_column" property="sortColumn"/>
+        <result column="sort" property="sort"/>
+        <result column="enable" property="enable"/>
+    </resultMap>
+
+    <sql id="SysFormLayoutViewCols">
+        `id`,`gmt_create`,`gmt_modified`,`create_account`,`modified_account`,`is_delete`,`object_id`,`name`,`type`,`query_criteria`,`table_column`,`table_column_mobile`,`sort_column`,`sort`,`enable`,`roles`
+    </sql>
+
+    <sql id="SysFormLayoutViewProps">
+        #{id},
+        #{gmtCreate},
+        #{gmtModified},
+        #{createAccount},
+        #{modifiedAccount},
+        #{isDelete},
+        #{objectId},
+        #{name},
+        #{type},
+        #{queryCriteria},
+        #{tableColumn},
+        #{tableColumnMobile},
+        #{sortColumn},
+        #{sort},
+        #{enable},
+        #{roles}
+    </sql>
+
+    <insert id="insert" parameterType="com.ruoyi.form.domain.LayoutView">
+        insert into lowcode_layout_view
+        (<include refid="SysFormLayoutViewCols"></include>)
+        values
+        (<include refid="SysFormLayoutViewProps"></include>)
+    </insert>
+
+    <update id="updateSelectiveByPK" parameterType="com.ruoyi.form.domain.LayoutView">
+        update lowcode_layout_view
+        <set>
+            <if test="gmtModified != null">
+                `gmt_modified` = #{gmtModified},
+            </if>
+
+            <if test="modifiedAccount != null and modifiedAccount != ''">
+                `modified_account` = #{modifiedAccount},
+            </if>
+
+            <if test="objectId != null">
+                `object_id` = #{objectId},
+            </if>
+
+            <if test="name != null and name != ''">
+                `name` = #{name},
+            </if>
+
+            <if test="type != null and type != ''">
+                `type` = #{type},
+            </if>
+
+            `query_criteria` = #{queryCriteria},
+
+            <if test="tableColumn != null and tableColumn != ''">
+                `table_column` = #{tableColumn},
+            </if>
+            <if test="sortColumn != null and sortColumn != ''">
+                `sort_column` = #{sortColumn},
+            </if>
+            <if test="sort != null and sort != ''">
+                `sort` = #{sort},
+            </if>
+            <if test="roles != null and roles != ''">
+                `roles` = #{roles},
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <delete id="deleteByPK">
+        <!--存在删除状态键则逻辑删除-->
+        update lowcode_layout_view
+        set is_delete = '1'
+        <where>
+            id = #{id}
+        </where>
+    </delete>
+
+    <select id="selectByPK" resultMap="SysFormLayoutViewMap">
+        select
+        <include refid="SysFormLayoutViewCols"></include>
+        from lowcode_layout_view
+        <where>
+            id = #{id}
+            and is_delete = '0'
+        </where>
+    </select>
+
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.form.mapper.TableUtilDao">
+
+	<update id="insertColumn">
+		ALTER table ${tableName}
+		<foreach collection="attrs"  item="attr"  open="" separator="," close=";" >
+
+			<if test="attr.dbType=='varchar'.toString()">
+				ADD COLUMN ${'`c'+attr.id+'`'} varchar(${attr.dbLength}) DEFAULT ''
+			</if>
+
+			<if test="attr.dbType=='decimal'.toString()">
+				ADD COLUMN ${'`c'+attr.id+'`'} decimal(${attr.dbLength},${attr.decimals})
+			</if>
+
+			<if test="attr.dbType=='int'.toString()">
+				ADD COLUMN ${'`c'+attr.id+'`'} int(${attr.dbLength})
+			</if>
+
+			<if test="attr.dbType=='date'.toString()">
+				ADD COLUMN ${'`c'+attr.id+'`'} datetime
+			</if>
+
+		</foreach>
+	</update>
+
+	<update id="modiColumn">
+		ALTER table ${tableName}
+		<foreach collection="attrs"  item="attr"  open="" separator="," close=";" >
+
+			<if test="attr.dbType=='varchar'.toString()">
+				MODIFY COLUMN ${'`c'+attr.id+'`'} varchar(${attr.dbLength}) DEFAULT ''
+			</if>
+
+			<if test="attr.dbType=='decimal'.toString()">
+				MODIFY COLUMN ${'`c'+attr.id+'`'} decimal(${attr.dbLength},${attr.decimals})
+			</if>
+
+			<if test="attr.dbType=='int'.toString()">
+				MODIFY COLUMN ${'`c'+attr.id+'`'} int(${attr.dbLength})
+			</if>
+
+			<if test="attr.dbType=='date'.toString()">
+				MODIFY COLUMN ${'`c'+attr.id+'`'} datetime
+			</if>
+
+		</foreach>
+	</update>
+
+	<update id="createMainTable">
+		CREATE TABLE ${tableName}  (
+		 `id` varchar(20) NOT NULL,
+		 `gmt_create` datetime NULL DEFAULT NULL,
+		 `gmt_modified` datetime NULL DEFAULT NULL,
+		 `create_account` varchar(50) NULL DEFAULT NULL COMMENT '创建人',
+		 `modified_account` varchar(50)  NULL DEFAULT NULL COMMENT '最后修改人',
+		 `is_delete` char(1)  NULL DEFAULT '0' COMMENT '删除状态 0 正常 1删除',
+		 PRIMARY KEY (`id`) USING BTREE
+		) ;
+	</update>
+
+	<update id="createExtTable">
+		CREATE TABLE ${tableName}  (
+		 `id` varchar(20) NOT NULL,
+		 `main_id` varchar(20) NULL DEFAULT NULL COMMENT '主表ID',
+		  PRIMARY KEY (`id`) USING BTREE
+		);
+	</update>
+
+    <update id="deleteTableByName">
+		drop table ${taleName}
+	</update>
+
+	<select id="selectMainTableData" resultType="java.lang.Long">
+		select count(1) from ${tableName} limit 1;
+	</select>
+
+
+</mapper>

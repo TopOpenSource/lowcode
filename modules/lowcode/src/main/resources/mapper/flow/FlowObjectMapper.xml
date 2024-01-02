@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.flow.mapper.FlowObjectMapper">
+
+    <resultMap id="BpmnModelDomainMap" type="com.ruoyi.flow.domain.FlowObject">
+        <id column="id" property="id" />
+        <result column="form_object_id" property="formObjectId" />
+        <result column="deploy_id" property="deploymentId" />
+        <result column="proc_def_id" property="processDefinitionId" />
+        <result column="flow_config" property="config" />
+    </resultMap>
+
+    <select id="selectByFormObjectId" resultMap="BpmnModelDomainMap">
+          select
+                 id,form_object_id,deploy_id,proc_def_id,flow_config
+          from lowcode_workflow
+          <where>
+              form_object_id=#{formObjectId}
+              and  is_delete=0
+          </where>
+    </select>
+    <select id="getByProcDefId" resultMap="BpmnModelDomainMap">
+        select
+        id,form_object_id,deploy_id,proc_def_id,flow_config
+        from lowcode_workflow
+        <where>
+            proc_def_id=#{processDefinitionId}
+            and  is_delete=0
+        </where>
+    </select>
+</mapper>

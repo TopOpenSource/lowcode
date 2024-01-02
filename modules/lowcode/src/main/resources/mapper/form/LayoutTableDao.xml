@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.form.mapper.LayoutTableDao">
+
+	<resultMap id="SysFormLayoutTableMap" type="com.ruoyi.form.domain.LayoutTable">
+		<id column="id" property="id" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modified" property="gmtModified" />
+		<result column="create_account" property="createAccount" />
+		<result column="modified_account" property="modifiedAccount" />
+		<result column="is_delete" property="isDelete" />
+		<result column="object_id" property="objectId" />
+		<result column="name" property="name" />
+		<result column="operation" property="operation" />
+		<result column="enable" property="enable" />
+		<result column="is_default" property="isDefault" />
+		<result column="modifiedName" property="modifiedName" />
+	</resultMap>
+
+	<resultMap id="SysFormLayoutTableDtoMap" type="com.ruoyi.form.dto.LayoutTableDto" extends="SysFormLayoutTableMap">
+
+	</resultMap>
+
+	<sql id="SysFormLayoutTableCols">
+		`id`,`gmt_create`,`gmt_modified`,`create_account`,`modified_account`,`is_delete`,`object_id`,`name`,`operation`,`enable`,`is_default`
+	</sql>
+
+	<sql id="SysFormLayoutTableProps">
+		#{id},#{gmtCreate},#{gmtModified},#{createAccount},#{modifiedAccount},#{isDelete},#{objectId},#{name},#{operation},#{enable},#{isDefault}
+	</sql>
+
+	<select id="selectByDto" parameterType="com.ruoyi.form.domain.LayoutTable" resultMap="SysFormLayoutTableMap">
+		select t1.*, t2.nick_name as modifiedName
+		from lowcode_layout_table t1
+		left join  sys_user t2 on t1.modified_account=t2.user_name
+		<where>
+			<if test="objectId!=null and objectId!=''">
+				and t1.object_id=#{objectId}
+			</if>
+			<if test="enable != null and enable != ''">
+				and t1.`enable` = #{enable}
+			</if>
+			and t1.is_delete='0'
+
+		</where>
+	</select>
+
+	<update id="enable" parameterType="com.ruoyi.form.domain.LayoutTable">
+		update lowcode_layout_table t1
+		set t1.enable=#{enable}
+		<where>
+			<if test="id!=null">
+				t1.id=#{id}
+			</if>
+			and t1.object_id=#{objectId}
+			and t1.is_delete='0'
+
+		</where>
+	</update>
+
+	<insert id="insertDto" parameterType="com.ruoyi.form.dto.LayoutTableDto">
+		insert into lowcode_layout_table
+		(<include refid="SysFormLayoutTableCols"></include>)
+		values
+		(<include refid="SysFormLayoutTableProps"></include>)
+	</insert>
+
+	<insert id="insertLayoutTableViews" parameterType="com.ruoyi.form.dto.LayoutTableDto">
+		insert into lowcode_layout_table_view
+		(id,gmt_create,gmt_modified,create_account,modified_account,is_delete,object_id,view_id,`index`,table_id)
+		values
+			(
+			#{tableViewId},
+			#{gmtCreate},
+			#{gmtModified},
+			#{createAccount},
+			#{modifiedAccount},
+			#{isDelete},
+			#{objectId},
+			#{viewId},
+			#{index},
+			#{id}
+			)
+	</insert>
+
+	<insert id="updateLayoutTableViews" parameterType="com.ruoyi.form.dto.LayoutTableDto">
+		update lowcode_layout_table_view
+		<set>
+
+			<if test="gmtCreate != null">
+				gmt_create = #{gmtCreate},
+			</if>
+
+			<if test="gmtModified != null">
+				gmt_modified = #{gmtModified},
+			</if>
+
+			<if test="createAccount != null and createAccount != ''">
+				create_account = #{createAccount},
+			</if>
+
+			<if test="modifiedAccount != null and modifiedAccount != ''">
+				modified_account = #{modifiedAccount},
+			</if>
+
+			<if test="isDelete != null and isDelete != ''">
+				is_delete = #{isDelete},
+			</if>
+
+
+
+			<if test="objectId != null">
+				object_id = #{objectId},
+			</if>
+
+			<if test="viewId != null and viewId != ''">
+				view_id = #{viewId},
+			</if>
+
+			<if test="index != null and index != ''">
+				`index` = #{index},
+			</if>
+
+			<if test="id != null and id != ''">
+				table_id = #{id},
+			</if>
+		</set>
+		<where>
+			id = #{id}
+
+		</where>
+	</insert>
+
+	<delete id="deleteLayoutTableViewsByViewId">
+		<!--存在删除状态键则逻辑删除-->
+		delete from lowcode_layout_table_view
+		<where>
+			table_id = #{tableId}
+		</where>
+	</delete>
+    <delete id="deleteByObjectId">
+		delete from lowcode_layout_table where object_id = #{objectId}
+	</delete>
+	<delete id="deleteViewByObjectId">
+		delete from lowcode_layout_table_view where object_id = #{objectId}
+	</delete>
+
+	<resultMap id="Table4ListDTOMap" type="com.ruoyi.form.dto.Table4ListDTO">
+		<id column="id" property="id"></id>
+		<result column="operation" property="operationsStr"></result>
+		<collection property="views"  ofType="com.ruoyi.form.dto.View4ListDTO">
+			<id column="view_id" property="id"></id>
+			<result column="view_name" property="name"></result>
+		</collection>
+	</resultMap>
+	<select id="getEnableTable" resultMap="Table4ListDTOMap">
+		SELECT
+			t3.id as id,
+			t3.operation as operation,
+			t2.id as view_id,
+			t2.name as view_name,
+			t2.table_column as table_column
+		FROM
+			      lowcode_layout_table_view t1
+		LEFT JOIN lowcode_layout_view t2 ON t1.view_id = t2.id
+		LEFT JOIN lowcode_layout_table t3 ON t1.table_id = t3.id
+		WHERE
+			t3.object_id = #{objectId}
+		  AND t3.`enable` = '1'
+		  AND t2.`enable`='1'
+		  AND t1.is_delete = '0'
+		  AND t2.is_delete = '0'
+		  AND t3.is_delete = '0'
+
+	</select>
+
+	<select id="selectDtoByPK" resultMap="SysFormLayoutTableDtoMap">
+		select
+		<include refid="SysFormLayoutTableCols"></include>
+		from lowcode_layout_table
+		<where>
+			id = #{id}
+
+			and is_delete = '0'
+		</where>
+	</select>
+
+	<select id="selectRefViewIds" resultType="String">
+		select
+		t1.view_id
+		from lowcode_layout_table_view t1
+		left join lowcode_layout_view  t2 on t1.view_id=t2.id
+		<where>
+			t1.table_id = #{tableId}
+			and t2.is_delete = '0'
+		</where>
+	</select>
+
+
+	<resultMap id="LayoutViewMap" type="com.ruoyi.form.domain.LayoutView">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="table_column" property="tableColumn" />
+	</resultMap>
+
+	<select id="selectRefViews" resultMap="LayoutViewMap" >
+		select
+		t2.id,t2.name,t2.table_column
+		from lowcode_layout_table_view t1
+		left join lowcode_layout_view  t2 on t1.view_id=t2.id
+		<where>
+			t1.table_id = #{tableId}
+			and t2.is_delete = '0'
+			<!--角色过滤-->
+		    and (
+		    <foreach collection="roleIds" item="item" open="(" close=")" separator="or">
+				FIND_IN_SET(#{item}, t2.roles)
+			</foreach>
+			or FIND_IN_SET('-1', t2.roles)
+			)
+		</where>
+        order by t1.`index`
+	</select>
+	<update id="updateSelectiveDtoByPK" parameterType="com.ruoyi.form.dto.LayoutTableDto">
+		update lowcode_layout_table
+		<set>
+
+			<if test="gmtCreate != null">
+				gmt_create = #{gmtCreate},
+			</if>
+
+			<if test="gmtModified != null">
+				gmt_modified = #{gmtModified},
+			</if>
+
+			<if test="createAccount != null and createAccount != ''">
+				create_account = #{createAccount},
+			</if>
+
+			<if test="modifiedAccount != null and modifiedAccount != ''">
+				modified_account = #{modifiedAccount},
+			</if>
+
+			<if test="isDelete != null and isDelete != ''">
+				is_delete = #{isDelete},
+			</if>
+
+			<if test="objectId != null">
+				object_id = #{objectId},
+			</if>
+
+			<if test="name != null and name != ''">
+				name = #{name},
+			</if>
+
+			<if test="operation != null and operation != ''">
+				operation = #{operation},
+			</if>
+		</set>
+		<where>
+			id = #{id}
+
+		</where>
+	</update>
+</mapper>

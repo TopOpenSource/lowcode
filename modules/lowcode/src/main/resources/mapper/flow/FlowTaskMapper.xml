@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.flow.mapper.FlowTaskMapper">
+
+    <resultMap id="FlowTaskMap" type="com.ruoyi.flow.domain.FlowTask">
+        <id property="id" column="id"/>
+        <result property="checkState" column="check_state" />
+        <result property="comment" column="comment" />
+        <result property="taskAssignee" column="task_assignee" />
+        <result property="createTime" column="create_time" />
+        <result property="taskName" column="flow_task_name" />
+    </resultMap>
+
+    <select id="getTaskHistory" parameterType="com.ruoyi.flow.domain.FlowTask"  resultMap="FlowTaskMap">
+        SELECT
+            t1.id,t1.check_state,t1.`comment`,t2.nick_name as task_assignee,t1.create_time,t1.flow_task_name
+        FROM
+            lowcode_workflow_task t1
+                LEFT JOIN sys_user t2 on t1.task_assignee=t2.user_name
+        <where>
+          t1.inst_id=#{instId}
+        </where>
+        order by create_time desc
+    </select>
+</mapper>

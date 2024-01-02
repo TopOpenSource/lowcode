@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.form.mapper.LayoutViewDao">
+	
+	<resultMap id="LayoutViewMap" type="com.ruoyi.form.domain.LayoutView">
+	    <id column="id" property="id" />
+	    <result column="gmt_create" property="gmtCreate" />
+	    <result column="gmt_modified" property="gmtModified" />
+	    <result column="create_account" property="createAccount" />
+	    <result column="modified_account" property="modifiedAccount" />
+	    <result column="is_delete" property="isDelete" />
+	    <result column="object_id" property="objectId" />
+	    <result column="name" property="name" />
+	    <result column="type" property="type" />
+	    <result column="query_criteria" property="queryCriteria" />
+	    <result column="table_column" property="tableColumn" />
+		<result column="modifiedName" property="modifiedName" />
+		<result column="enable" property="enable" />
+		<result column="table_column_mobile" property="tableColumnMobile" />
+		<result column="sort_column" property="sortColumn" />
+		<result column="sort" property="sort" />
+		<result column="index" property="index" />
+	</resultMap>
+    <delete id="deleteByObjectId">
+		delete from lowcode_layout_view where object_id = #{objectId}
+	</delete>
+
+
+    <select id="selectByDto" parameterType="com.ruoyi.form.domain.LayoutView" resultMap="LayoutViewMap">
+		select
+		t1.`id`,t1.`gmt_modified`,t1.`modified_account`,t1.`object_id`,t1.`name`,t1.`type`,t1.`query_criteria`,t1.`table_column`,
+		t1.`enable`,t2.nick_name as modifiedName
+		from lowcode_layout_view t1
+		left join  sys_user t2 on t1.modified_account=t2.user_name
+		<where>
+			<if test="objectId!=null and objectId!=''">
+				and t1.object_id=#{objectId}
+			</if>
+			<if test="type!=null and type!=''">
+				and t1.type=#{type}
+			</if>
+			<if test="enable!=null and enable!=''">
+				and t1.enable=#{enable}
+			</if>
+			and t1.is_delete='0'
+		</where>
+	</select>
+
+	<update id="enable" parameterType="com.ruoyi.form.domain.LayoutTable">
+		update lowcode_layout_view t1
+		set t1.enable=#{enable}
+		<where>
+			<if test="id!=null">
+				t1.id=#{id}
+			</if>
+			and t1.type=#{type}
+			and t1.object_id=#{objectId}
+			and t1.is_delete='0'
+		</where>
+	</update>
+
+
+</mapper>
